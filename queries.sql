@@ -12,7 +12,7 @@ s.product_id as id,
 s.quantity * p.price as amount
 from sales s
 join products p
-on p.product_id = s.product_id
+on p.product_id = s.product_id --присоединяем таблицу products по id
 order by id
 ), 
 --с объединением имени и фамилии сотрудника
@@ -38,12 +38,38 @@ sum(c.counts) as operations, --суммируем все сделки
 sum(agr.amount) as income --сумируем выручку
 from sales s
 join agr
-on agr.id = s.product_id 
+on agr.id = s.product_id --присоединяем таблицу agr по id 
 join names n
-on n.id = s.sales_person_id 
+on n.id = s.sales_person_id --присоединяем таблицу names по id
 join counts c
-on c.id = s.sales_person_id 
+on c.id = s.sales_person_id --присоединяем таблицу counts по id
 group by 1 --группируем по name
 order by income desc --сортируем по income в порядке убывания
 limit 10 --ограничиваем запрос 10-ю строками
 ;--получаем таблицу топ 10 продавцов по выручке
+
+--3
+--создаём вспомогательную таблицу 
+with tab as(
+select 
+concat(e.first_name,' ',e.last_name) as name, --соединяем имя и фамилию сотрудника
+avg(s.quantity * p.price) as avgprice --вычисляем среднюю выручку
+from sales s
+join products p
+on p.product_id = s.product_id --присоединяем таблицу products по id
+join employees e 
+on s.sales_person_id  = e.employee_id --присоединяем таблицу employees по id
+group by e.first_name ,e.last_name --группируем по имени и фамилии
+order by name --сортируем по name по возрастанию
+)
+select
+name,
+round(avgprice) as average_income --округляем значение средней выручки
+from tab
+where avgprice < (select 
+         avg(s.quantity * p.price)
+         from sales s
+         join products p
+         on p.product_id = s.product_id) --создаём подзапрос позволяющий подсчитать среднюю выручку по всем продавцам 
+order by average_income --сортируем по average_income в порядке возрастания
+;--получаем таблицу с сотрудниками чья выручка меньше средней
