@@ -109,3 +109,17 @@ from customers
 group by age_category--группируем по возрастным категориям
 order by age_category--сортируем по возростным категориям
 ;--получаем таблицу с колличеством покупателей в каждой возрастной категории
+
+--6
+select 
+to_char(sale_date,'yyyy-mm') as date, --выделяем из даты только год и месяц
+count(s.customer_id) as total_customers, --подсчитываем число покупателей
+floor(sum(p.price*s.quantity)) as income --вычисляем выручку и округляем
+from sales s 
+join customers c 
+on c.customer_id = s.customer_id --присоединяем customers по id 
+join products p
+on p.product_id = s.product_id --присоединяем products по id 
+group by date --группируем
+order by date-- сортируем по возрастанию
+; --получаем таблицу с числом уникальных покупателей и выручкой за каждый месяц
