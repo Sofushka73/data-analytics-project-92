@@ -35,7 +35,7 @@ group by id
 select 
 distinct(n.name) as name, --вытаскиваем уникальные имена
 sum(c.counts) as operations, --суммируем все сделки
-sum(agr.amount) as income --сумируем выручку
+round(sum(agr.amount)) as income --сумируем выручку и округляем
 from sales s
 join agr
 on agr.id = s.product_id --присоединяем таблицу agr по id 
