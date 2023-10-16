@@ -35,7 +35,7 @@ group by id
 select 
 distinct(n.name) as name, --вытаскиваем уникальные имена
 sum(c.counts) as operations, --суммируем все сделки
-round(sum(agr.amount)) as income --сумируем выручку и округляем
+floor(sum(agr.amount)) as income --сумируем выручку и округляем
 from sales s
 join agr
 on agr.id = s.product_id --присоединяем таблицу agr по id 
@@ -64,7 +64,7 @@ order by name --сортируем по name по возрастанию
 )
 select
 name,
-round(avgprice) as average_income --округляем значение средней выручки
+floor(avgprice) as average_income --округляем значение средней выручки
 from tab
 where avgprice < (select 
          avg(s.quantity * p.price)
@@ -91,7 +91,7 @@ on p.product_id = s.product_id --присоединяем таблицу product
 select 
 name,
 day as weekday,
-round(sum(amount)) as income--суммируем и округляем выручку
+floor(sum(amount)) as income--суммируем и округляем выручку
 from tab
 group by name, weekday, numberday --группируем таблицу по 3 столбцам
 order by numberday, name --сортируем по 2 столбцам в порядке возрастания
