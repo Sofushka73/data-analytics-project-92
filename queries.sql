@@ -96,3 +96,16 @@ from tab
 group by name, weekday, numberday --группируем таблицу по 3 столбцам
 order by numberday, name --сортируем по 2 столбцам в порядке возрастания
 ;--получаем таблицу с выручкой продавцов за каждый день недели
+
+--5
+select 
+case --с помощью case разделяем покупателей на группы по возрасту
+when age between 16 and 25 then '16-25'
+when age between 26 and 40 then '26-40'
+else '40+'
+end as age_category ,
+count(age) as count --подсчитываем кол-во покупателей по возрасту
+from customers
+group by age_category--группируем по возрастным категориям
+order by age_category--сортируем по возростным категориям
+;--получаем таблицу с колличеством покупателей в каждой возрастной категории
