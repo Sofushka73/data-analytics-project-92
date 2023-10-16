@@ -73,3 +73,26 @@ where avgprice < (select
          on p.product_id = s.product_id) --создаём подзапрос позволяющий подсчитать среднюю выручку по всем продавцам 
 order by average_income --сортируем по average_income в порядке возрастания
 ;--получаем таблицу с сотрудниками чья выручка меньше средней
+
+--4
+--создаём вспомогательную таблицу
+with tab as(
+select 
+concat(e.first_name,' ',e.last_name) as name, --соединяем имя и фамилию сотрудников
+to_char(s.sale_date, 'day') as day,--получаем название дня недели
+to_char(s.sale_date, 'id') as numberday,--получаем порядковый номер дня недели
+p.price * s.quantity as amount --подсчитываем выручку 
+from sales s 
+join employees e 
+on e.employee_id = s.sales_person_id --присоединяем таблицу emloyees по id
+join products p 
+on p.product_id = s.product_id --присоединяем таблицу products по id 
+)
+select 
+name,
+day as weekday,
+round(sum(amount)) as income--суммируем и округляем выручку
+from tab
+group by name, weekday, numberday --группируем таблицу по 3 столбцам
+order by numberday, name --сортируем по 2 столбцам в порядке возрастания
+;--получаем таблицу с выручкой продавцов за каждый день недели
