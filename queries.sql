@@ -123,3 +123,34 @@ on p.product_id = s.product_id --присоединяем products по id
 group by date --группируем
 order by date-- сортируем по возрастанию
 ; --получаем таблицу с числом уникальных покупателей и выручкой за каждый месяц
+
+--7
+select
+t.customer,
+t.sale_date,
+min(concat(e.first_name,' ',e.last_name))  as seller --соединяем имя и фамилию сотрудника, выделяем самого первого
+from (select                                   --подзапрос№2
+id,
+customer, 
+min(date) as sale_date   --вытаскиваем самую раннюю дату
+from (select                                    --подзапрос№1
+p.price as price,
+concat(c.first_name,' ',c.last_name) as customer, --скрещиваем имя и фамилию покупателя
+c.customer_id as id,
+s.sale_date as date
+from sales s 
+join products p 
+on p.product_id = s.product_id --соединяем таблицы по id
+join customers c 
+on c.customer_id = s.customer_id --соединяем таблицы по id
+) as fool
+where price = 0 --выделяем только строки со значением цены 0
+group by 1,2 --группируем по id и customer
+) as t
+join sales s
+on s.customer_id = t.id --соединяем таблицы по id
+join employees e 
+on s.sales_person_id = e.employee_id --соединяем по id
+group by 1,2,t.id --группируем по customer, sale_date и id
+order by t.id --сортируем по id в порядке возрастания
+; -- получаем таблицу с клиентами что совершили свою первую покупку по акции
