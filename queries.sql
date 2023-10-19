@@ -34,7 +34,7 @@ group by id
 --соединяем вспомогательные таблицы с таблицей sales
 select 
 distinct(n.name) as name, --вытаскиваем уникальные имена
-sum(c.counts) as operations, --суммируем все сделки
+c.counts as operations, 
 floor(sum(agr.amount)) as income --сумируем выручку и округляем
 from sales s
 join agr
