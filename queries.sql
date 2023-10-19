@@ -113,7 +113,7 @@ order by age_category--сортируем по возростным катего
 --6
 select 
 to_char(sale_date,'yyyy-mm') as date, --выделяем из даты только год и месяц
-count(s.customer_id) as total_customers, --подсчитываем число покупателей
+count(distinct(s.customer_id)) as total_customers, --подсчитываем число уникальных покупателей
 floor(sum(p.price*s.quantity)) as income --вычисляем выручку и округляем
 from sales s 
 join customers c 
