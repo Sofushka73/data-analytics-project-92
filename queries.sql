@@ -5,48 +5,24 @@ count(customer_id) as customers_count
 from customers 
 ;
 --2
---создаём вспомогательные таблицы с подсчётом выручки
-with agr as(
-select
-s.product_id as id,
-s.quantity * p.price as amount
-from sales s
-join products p
-on p.product_id = s.product_id --присоединяем таблицу products по id
-order by id
-), 
---с объединением имени и фамилии сотрудника
-names as(
-select
-employee_id as id,
-concat(first_name,' ',last_name) as name
-from employees 
-order by id
-),
---с подсчётом кол-ва сделок
-counts as(
-select
-sales_person_id as id,
-count(sales_id) as counts
-from sales 
-group by id
-)
---соединяем вспомогательные таблицы с таблицей sales
 select 
-distinct(n.name) as name, --вытаскиваем уникальные имена
-c.counts as operations, 
-floor(sum(agr.amount)) as income --сумируем выручку и округляем
-from sales s
-join agr
-on agr.id = s.product_id --присоединяем таблицу agr по id 
-join names n
-on n.id = s.sales_person_id --присоединяем таблицу names по id
-join counts c
-on c.id = s.sales_person_id --присоединяем таблицу counts по id
-group by 1 --группируем по name
-order by income desc --сортируем по income в порядке убывания
-limit 10 --ограничиваем запрос 10-ю строками
-;--получаем таблицу топ 10 продавцов по выручке
+name,
+operations,
+floor(income) as income --округляем в меньшую сторону
+from ( select                          --делаем подзапрос
+concat(e.first_name,' ',e.last_name) as name, --соединяем имя и фамилию сотрудника
+sum(s.quantity* p.price) as income, --высчитываем выручку
+count(s.sales_id) as operations --подсчитываем кол-во сделок
+from sales s 
+join products p 
+on p.product_id = s.product_id --соединяем по id
+join employees e 
+on e.employee_id = s.sales_person_id --соединяем по id
+group by e.first_name , e.last_name --группируем 
+) as tab
+order by income desc --сортируем по выручке в порядке убывания
+limit 10 --ограничиваем таблицу 10-ю строками
+;-- получаем топ10 сотрудников
 
 --3
 --создаём вспомогательную таблицу 
